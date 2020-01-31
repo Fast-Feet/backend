@@ -12,9 +12,9 @@ export default async function userAuth(req, res, next) {
         req.payload = payload;
         return next();
       } catch (error) {
-        return res.status(404).json({ error: "Invalid token" });
+        return res.status(401).json({ error: "Invalid token" });
       }
     }
   }
-  return res.status(404).json({ error: "You are not logged in" });
+  return res.status(400).json({ error: "You are not logged in" });
 }

@@ -28,14 +28,14 @@ class SessionController {
       },
     });
     if (!user) {
-      return res.status(404).json({ error: "User does not exist" });
+      return res.status(401).json({ error: "User does not exist" });
     }
     // Check if password is correct
     const checkPassword = await bcrypt.compare(password, user.password_hash);
 
     if (!checkPassword) {
       return res
-        .status(404)
+        .status(401)
         .json({ error: "Email and password does not match" });
     }
     // Return token in response: the client should store this token locally (localStorage) and use it to interact with the application
