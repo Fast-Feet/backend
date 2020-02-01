@@ -1,6 +1,6 @@
 const authConfig = {
   expiresIn: "7d",
-  secretKey: process.env.PRIVATE_KEY,
+  secretKey: process.env.SECRET_KEY,
 };
 
 export default authConfig;
