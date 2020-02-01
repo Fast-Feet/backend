@@ -25,6 +25,7 @@ routes.put("/recipients", userAuth, RecipientController.update);
 routes.get("/deliverymen", userAuth, DeliveryManController.index);
 routes.post("/deliverymen", userAuth, DeliveryManController.store);
 routes.delete("/deliverymen", userAuth, DeliveryManController.destroy);
+routes.put("/deliverymen", userAuth, DeliveryManController.update);
 
 // files
 routes.post(
