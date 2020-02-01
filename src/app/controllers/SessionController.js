@@ -1,6 +1,8 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import * as yup from "yup";
+
+import authConfig from "../../config/auth";
 import User from "../models/User";
 
 class SessionController {
@@ -39,12 +41,13 @@ class SessionController {
         .json({ error: "Email and password does not match" });
     }
     // Return token in response: the client should store this token locally (localStorage) and use it to interact with the application
-    const { PRIVATE_KEY, TOKEN_VALIDITY } = process.env;
     const payload = {
       email: user.email,
       id: user.id,
     };
-    const token = jwt.sign(payload, PRIVATE_KEY, { expiresIn: TOKEN_VALIDITY });
+    const token = jwt.sign(payload, authConfig.secretKey, {
+      expiresIn: authConfig.expiresIn,
+    });
 
     return res.json({
       token,
