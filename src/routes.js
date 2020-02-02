@@ -5,6 +5,7 @@ import multerConfig from "./config/multer";
 import SessionController from "./app/controllers/SessionController";
 import RecipientController from "./app/controllers/RecipientController";
 import DeliveryManController from "./app/controllers/DeliveryManController";
+import OrderController from "./app/controllers/OrderController";
 import FileController from "./app/controllers/FileController";
 import SignatureController from "./app/controllers/SignatureController";
 
@@ -27,6 +28,8 @@ routes.get("/deliverymen", userAuth, DeliveryManController.index);
 routes.post("/deliverymen", userAuth, DeliveryManController.store);
 routes.delete("/deliverymen", userAuth, DeliveryManController.destroy);
 routes.put("/deliverymen", userAuth, DeliveryManController.update);
+// orders
+routes.post("/orders", userAuth, OrderController.store);
 // files
 routes.post(
   "/files",
