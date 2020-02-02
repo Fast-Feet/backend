@@ -4,8 +4,9 @@ import multer from "multer";
 import multerConfig from "./config/multer";
 import SessionController from "./app/controllers/SessionController";
 import RecipientController from "./app/controllers/RecipientController";
-import FileController from "./app/controllers/FileController";
 import DeliveryManController from "./app/controllers/DeliveryManController";
+import FileController from "./app/controllers/FileController";
+import SignatureController from "./app/controllers/SignatureController";
 
 import userAuth from "./app/middlewares/auth";
 
@@ -26,7 +27,6 @@ routes.get("/deliverymen", userAuth, DeliveryManController.index);
 routes.post("/deliverymen", userAuth, DeliveryManController.store);
 routes.delete("/deliverymen", userAuth, DeliveryManController.destroy);
 routes.put("/deliverymen", userAuth, DeliveryManController.update);
-
 // files
 routes.post(
   "/files",
@@ -39,5 +39,18 @@ routes.post(
     });
   },
   FileController.store
+);
+// signatures
+routes.post(
+  "/signatures",
+  (req, res, next) => {
+    uploads(req, res, err => {
+      if (err) {
+        return res.status(400).json({ error: err.message });
+      }
+      return next();
+    });
+  },
+  SignatureController.store
 );
 export default routes;
