@@ -6,7 +6,10 @@ import SessionController from "./app/controllers/SessionController";
 import RecipientController from "./app/controllers/RecipientController";
 import DeliveryManController from "./app/controllers/DeliveryManController";
 import OrderController from "./app/controllers/OrderController";
+import VisualizeOrderController from "./app/controllers/VisualizeOrderController";
+import DeliveredOrderController from "./app/controllers/DeliveredOrderController";
 import FileController from "./app/controllers/FileController";
+import StartDeliveryController from "./app/controllers/StartDeliveryController";
 import SignatureController from "./app/controllers/SignatureController";
 
 import userAuth from "./app/middlewares/auth";
@@ -33,6 +36,16 @@ routes.get("/orders", userAuth, OrderController.index);
 routes.post("/orders", userAuth, OrderController.store);
 routes.put("/orders", userAuth, OrderController.update);
 routes.delete("/orders", userAuth, OrderController.destroy);
+// deliveryman
+routes.get("/deliveryman/:deliveryman_id", VisualizeOrderController.index);
+routes.get(
+  "/deliveryman/:deliveryman_id/deliveries",
+  DeliveredOrderController.index
+);
+routes.post(
+  "/deliveryman/:deliveryman_id/start_delivery",
+  StartDeliveryController.store
+);
 // files
 routes.post(
   "/files",
