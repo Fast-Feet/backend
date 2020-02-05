@@ -58,9 +58,9 @@ class Mail {
     <th>Address</th>
     <td>${address}</td>
   </tr>
-  ${number !== undefined ? `<tr><th>Number</th><td>${number}</td></tr>` : ""}
+  ${number !== null ? `<tr><th>Number</th><td>${number}</td></tr>` : ""}
   ${
-    address_complement !== undefined
+    address_complement !== null
       ? `<tr><th>Address Complement</th><td>${address_complement}</td></tr>`
       : ""
   }

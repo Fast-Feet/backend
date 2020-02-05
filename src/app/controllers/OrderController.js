@@ -1,6 +1,7 @@
 import * as yup from "yup";
 
-import Mail from "../../lib/Mail";
+// import Mail from "../../lib/Mail";
+import Queue from "../../lib/Queue";
 import Order from "../models/Order";
 import DeliveryMan from "../models/DeliveryMan";
 import Recipient from "../models/Recipient";
@@ -36,8 +37,9 @@ class OrderController {
       const order = await Order.create(req.body);
       const deliveryman = await DeliveryMan.findByPk(req.body.deliveryman_id);
       const recipient = await Recipient.findByPk(req.body.recipient_id);
-      // send email to deliveryman (to be done!)
-      await Mail.sendMail({ order, deliveryman, recipient });
+      // enqueue email to be sent to deliveryman
+      await Queue.add("NewOrderMail", { order, deliveryman, recipient });
+      // await Mail.sendMail({ order, deliveryman, recipient });
       return res.json({ order, deliveryman });
     } catch (error) {
       return res.status(401).json(error);
