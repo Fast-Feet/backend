@@ -1,7 +1,9 @@
 import * as yup from "yup";
 
+import Mail from "../../lib/Mail";
 import Order from "../models/Order";
 import DeliveryMan from "../models/DeliveryMan";
+import Recipient from "../models/Recipient";
 
 class OrderController {
   async store(req, res) {
@@ -32,8 +34,10 @@ class OrderController {
     // We do not need to check if the foreign keys constraints are satisfied if we put our code in a try-catch block
     try {
       const order = await Order.create(req.body);
-      // send email to deliveryman (to be done!)
       const deliveryman = await DeliveryMan.findByPk(req.body.deliveryman_id);
+      const recipient = await Recipient.findByPk(req.body.recipient_id);
+      // send email to deliveryman (to be done!)
+      await Mail.sendMail({ order, deliveryman, recipient });
       return res.json({ order, deliveryman });
     } catch (error) {
       return res.status(401).json(error);
