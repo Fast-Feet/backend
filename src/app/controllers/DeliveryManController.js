@@ -1,5 +1,6 @@
 import * as yup from "yup";
 import DeliveryMan from "../models/DeliveryMan";
+import { LIMIT } from "../globals/constants";
 
 class DeliveryManController {
   async store(req, res) {
@@ -28,7 +29,11 @@ class DeliveryManController {
   }
 
   async index(req, res) {
-    const deliverymen = await DeliveryMan.findAll();
+    const { page = 1 } = req.query;
+    const deliverymen = await DeliveryMan.findAll({
+      limit: LIMIT,
+      offset: (page - 1) * LIMIT,
+    });
     return res.json(deliverymen);
   }
 

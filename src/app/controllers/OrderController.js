@@ -1,10 +1,10 @@
 import * as yup from "yup";
 
-// import Mail from "../../lib/Mail";
 import Queue from "../../lib/Queue";
 import Order from "../models/Order";
 import DeliveryMan from "../models/DeliveryMan";
 import Recipient from "../models/Recipient";
+import { LIMIT } from "../globals/constants";
 
 class OrderController {
   async store(req, res) {
@@ -39,11 +39,75 @@ class OrderController {
       const recipient = await Recipient.findByPk(req.body.recipient_id);
       // enqueue email to be sent to deliveryman
       await Queue.add("NewOrderMail", { order, deliveryman, recipient });
-      // await Mail.sendMail({ order, deliveryman, recipient });
-      return res.json({ order, deliveryman });
+
+      return res.json({ order, deliveryman, recipient });
     } catch (error) {
       return res.status(401).json(error);
     }
+  }
+
+  async index(req, res) {
+    const { page = 1 } = req.query;
+    const orders = await Order.findAll({
+      limit: LIMIT,
+      offset: (page - 1) * LIMIT,
+    });
+    return res.json(orders);
+  }
+
+  async update(req, res) {
+    // Only the product and the deliveryman_id can be updated
+    // Data validation: id must be informed
+    const schema = yup.object().shape({
+      id: yup
+        .number()
+        .integer()
+        .min(1)
+        .required(),
+      product: yup.string(),
+      deliveryman_id: yup
+        .number()
+        .integer()
+        .min(1),
+    });
+    if (!(await schema.isValid(req.body))) {
+      return res.status(400).json({ error: "Validation fails" });
+    }
+    const order = await Order.findByPk(req.body.id);
+    if (!order) {
+      return res.status(400).json({ error: "Order does not exist" });
+    }
+    const { product, deliveryman_id } = req.body;
+    // Put update in a try-catch block because deliveryman_id must be valid
+    try {
+      const result = await order.update(
+        { product, deliveryman_id },
+        { new: true }
+      );
+      return res.json(result);
+    } catch (err) {
+      return res.status(400).json(err);
+    }
+  }
+
+  async destroy(req, res) {
+    // Data validation: id must be informed
+    const schema = yup.object().shape({
+      id: yup
+        .number()
+        .integer()
+        .min(1)
+        .required(),
+    });
+    if (!(await schema.isValid(req.body))) {
+      return res.status(400).json({ error: "Validation fails" });
+    }
+    const result = await Order.destroy({
+      where: {
+        id: req.body.id,
+      },
+    });
+    return res.json({ message: `${result} order deleted from database` });
   }
 }
 

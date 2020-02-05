@@ -29,7 +29,10 @@ routes.post("/deliverymen", userAuth, DeliveryManController.store);
 routes.delete("/deliverymen", userAuth, DeliveryManController.destroy);
 routes.put("/deliverymen", userAuth, DeliveryManController.update);
 // orders
+routes.get("/orders", userAuth, OrderController.index);
 routes.post("/orders", userAuth, OrderController.store);
+routes.put("/orders", userAuth, OrderController.update);
+routes.delete("/orders", userAuth, OrderController.destroy);
 // files
 routes.post(
   "/files",
