@@ -1,4 +1,5 @@
 import Sequelize from "sequelize";
+import mongoose from "mongoose";
 
 import databaseConfig from "../config/database";
 import User from "../app/models/User";
@@ -20,6 +21,22 @@ class Database {
     models
       .map(model => model.init(this.connection))
       .map(model => model.associate && model.associate(this.connection.models));
+    this.mongo();
+  }
+
+  mongo() {
+    const { MONGO_HOST, MONGO_PORT, MONGO_DATABASE } = process.env;
+    this.mongoConnection = mongoose
+      .connect(`mongodb://${MONGO_HOST}:${MONGO_PORT}/${MONGO_DATABASE}`, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+      })
+      .then(() => console.log("Connect to MongoDB server"))
+      .catch(err => {
+        console.log("Connection error to MongoDB server");
+        console.log(err.message);
+        console.log(err.reason);
+      });
   }
 }
 

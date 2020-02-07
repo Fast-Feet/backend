@@ -10,8 +10,9 @@ import FileController from "./app/controllers/FileController";
 import StartDeliveryController from "./app/controllers/StartDeliveryController";
 import FinishDeliveryController from "./app/controllers/FinishDeliveryController";
 import SignatureController from "./app/controllers/SignatureController";
+import DeliveryProblemsController from "./app/controllers/DeliveryProblemsController";
 // Middlewares
-import userAuth from "./app/middlewares/auth";
+import adminAuth from "./app/middlewares/auth";
 import Upload from "./app/middlewares/upload";
 
 const routes = new Router();
@@ -23,18 +24,18 @@ routes.get("/", (req, res) => {
 // sessions
 routes.post("/sessions", SessionController.store);
 // recipients
-routes.post("/recipients", userAuth, RecipientController.store);
-routes.put("/recipients", userAuth, RecipientController.update);
+routes.post("/recipients", adminAuth, RecipientController.store);
+routes.put("/recipients", adminAuth, RecipientController.update);
 // deliverymen
-routes.get("/deliverymen", userAuth, DeliveryManController.index);
-routes.post("/deliverymen", userAuth, DeliveryManController.store);
-routes.delete("/deliverymen", userAuth, DeliveryManController.destroy);
-routes.put("/deliverymen", userAuth, DeliveryManController.update);
+routes.get("/deliverymen", adminAuth, DeliveryManController.index);
+routes.post("/deliverymen", adminAuth, DeliveryManController.store);
+routes.delete("/deliverymen", adminAuth, DeliveryManController.destroy);
+routes.put("/deliverymen", adminAuth, DeliveryManController.update);
 // orders
-routes.get("/orders", userAuth, OrderController.index);
-routes.post("/orders", userAuth, OrderController.store);
-routes.put("/orders", userAuth, OrderController.update);
-routes.delete("/orders", userAuth, OrderController.destroy);
+routes.get("/orders", adminAuth, OrderController.index);
+routes.post("/orders", adminAuth, OrderController.store);
+routes.put("/orders", adminAuth, OrderController.update);
+routes.delete("/orders", adminAuth, OrderController.destroy);
 // deliveryman
 routes.get("/deliveryman/:deliveryman_id", VisualizeOrderController.index);
 routes.get(
@@ -50,6 +51,23 @@ routes.post(
   Upload.signature,
   FinishDeliveryController.store
 );
+// delivery problems: https://fastfeet.com/delivery/3/problems
+routes.get("/delivery/problems", adminAuth, DeliveryProblemsController.index);
+routes.get(
+  "/delivery/:delivery_id/problems",
+  adminAuth,
+  DeliveryProblemsController.show
+);
+routes.delete(
+  "/delivery/:problem_id/cancel-delivery",
+  adminAuth,
+  DeliveryProblemsController.destroy
+);
+routes.post(
+  "/delivery/:delivery_id/problems",
+  DeliveryProblemsController.store
+);
+
 // files
 routes.post("/files", Upload.avatar, FileController.store);
 // signatures
