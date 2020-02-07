@@ -1,18 +1,17 @@
-import { Op } from "sequelize";
-import {
-  parseISO,
-  isValid,
-  getHours,
-  startOfHour,
-  startOfDay,
-  endOfDay,
-} from "date-fns";
+import { parseISO, isValid, isBefore } from "date-fns";
 import * as yup from "yup";
 
 import Order from "../models/Order";
+import Signature from "../models/Signature";
 
-class StartDeliveryController {
+class FinishDeliveryController {
   async store(req, res) {
+    // Check if file was uploaded
+    if (req.fileUpload.failed) {
+      return res
+        .status(401)
+        .json({ error: "Allowed images formats are jpeg, jpg, png, and gif" });
+    }
     // Data validation
     const schema = yup.object().shape({
       order_id: yup
@@ -47,42 +46,34 @@ class StartDeliveryController {
     if (order.canceled_at) {
       return res.status(401).json({ error: "Order was cancelled" });
     }
-    // Check if start_date is not null
-    if (order.start_date) {
-      return res.status(400).json({ error: "Delivery has already started" });
+    // Check if end_date is not null
+    if (order.end_date) {
+      return res.status(400).json({ error: "Delivery has already finished" });
     }
-    // Check if start_date is btw 08:00 and 18:00
-    const hour = getHours(parsedDate);
-    const hourEnd = hour + (parsedDate - startOfHour(parsedDate) > 0 ? 1 : 0);
-
-    if (hour < 8 || hourEnd > 18) {
-      return res.status(401).json({
-        error: "Pick up hours are between 08:00 and 18:00",
-      });
+    // Check if start_date has already begun
+    if (!order.start_date) {
+      return res.status(400).json({ error: "Start date has not begun yet" });
     }
-    // Check how many pick ups the delivery man did already in the following day
-    const pickups = await Order.findAll({
-      where: {
-        deliveryman_id,
-        start_date: {
-          [Op.between]: [startOfDay(parsedDate), endOfDay(parsedDate)],
-        },
-      },
-    });
-    if (pickups.length >= 5) {
+    // Check if start_date is before end_date
+    if (!isBefore(order.start_date, parsedDate)) {
       return res
         .status(401)
-        .json({ error: "Maximum number of pick ups orders achieved" });
+        .json({ error: "start_date must be before end_date" });
     }
     // Finally, we are good to go!
+    // First, insert into signatures tables the filename and path
+    const { originalname: name, filename: path } = req.file;
+    const signature = await Signature.create({ name, path });
+    // Update order
     const orderUpdated = await order.update(
       {
-        start_date: parsedDate,
+        end_date: parsedDate,
+        signature_id: signature.id,
       },
       { new: true }
     );
-    return res.json(orderUpdated);
+    return res.json({ order: orderUpdated, signature });
   }
 }
 
-export default new StartDeliveryController();
+export default new FinishDeliveryController();

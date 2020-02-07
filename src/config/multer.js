@@ -2,6 +2,25 @@ import crypto from "crypto";
 import multer from "multer";
 import { extname, resolve } from "path";
 
+import {
+  SIGNATURE_FILE_SIZE,
+  AVATAR_FILE_SIZE,
+} from "../app/globals/constants";
+
+export const avatar_limit = {
+  limits: {
+    files: 1,
+    fileSize: AVATAR_FILE_SIZE,
+  },
+};
+
+export const signature_limit = {
+  limits: {
+    files: 1,
+    fileSize: SIGNATURE_FILE_SIZE,
+  },
+};
+
 export default {
   storage: multer.diskStorage({
     destination: resolve(__dirname, "..", "..", "temp", "uploads"),
@@ -13,10 +32,6 @@ export default {
       });
     },
   }),
-  limits: {
-    files: 1,
-    fileSize: 2 * 1024 * 1024, // 2M
-  },
   fileFilter: (req, file, cb) => {
     const fileExtension = extname(file.originalname);
     const imagesExtensions = [".jpg", ".jpeg", ".png", ".gif"];

@@ -1,7 +1,5 @@
 import { Router } from "express";
-import multer from "multer";
-
-import multerConfig from "./config/multer";
+// Controllers
 import SessionController from "./app/controllers/SessionController";
 import RecipientController from "./app/controllers/RecipientController";
 import DeliveryManController from "./app/controllers/DeliveryManController";
@@ -10,12 +8,13 @@ import VisualizeOrderController from "./app/controllers/VisualizeOrderController
 import DeliveredOrderController from "./app/controllers/DeliveredOrderController";
 import FileController from "./app/controllers/FileController";
 import StartDeliveryController from "./app/controllers/StartDeliveryController";
+import FinishDeliveryController from "./app/controllers/FinishDeliveryController";
 import SignatureController from "./app/controllers/SignatureController";
-
+// Middlewares
 import userAuth from "./app/middlewares/auth";
+import Upload from "./app/middlewares/upload";
 
 const routes = new Router();
-const uploads = multer(multerConfig).single("file");
 
 routes.get("/", (req, res) => {
   return res.json({ message: "Hello from backend!" });
@@ -46,30 +45,13 @@ routes.post(
   "/deliveryman/:deliveryman_id/start_delivery",
   StartDeliveryController.store
 );
+routes.post(
+  "/deliveryman/:deliveryman_id/finish_delivery",
+  Upload.signature,
+  FinishDeliveryController.store
+);
 // files
-routes.post(
-  "/files",
-  (req, res, next) => {
-    uploads(req, res, err => {
-      if (err) {
-        return res.status(400).json({ error: err.message });
-      }
-      return next();
-    });
-  },
-  FileController.store
-);
+routes.post("/files", Upload.avatar, FileController.store);
 // signatures
-routes.post(
-  "/signatures",
-  (req, res, next) => {
-    uploads(req, res, err => {
-      if (err) {
-        return res.status(400).json({ error: err.message });
-      }
-      return next();
-    });
-  },
-  SignatureController.store
-);
+routes.post("/signatures", Upload.signature, SignatureController.store);
 export default routes;
