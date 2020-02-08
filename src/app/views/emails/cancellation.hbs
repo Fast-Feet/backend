@@ -1,0 +1,46 @@
+<h2>Cancellation of Order</h2>
+<hr/>
+<p>Dear <strong>{{ name }}</strong>,</p>
+<p>The <strong>order #{{ order_id }}</strong> was cancelled due to the following reason: "<span style="color:red; font-weight: bold;">{{ description }}</span>."</p>
+<p> Below follows the order details:</p>
+<table>
+  <tr>
+    <th>Product</th>
+    <td>{{ product }}</td>
+  </tr>
+  <tr>
+    <th>Name</th>
+    <td>{{ recipient }}</td>
+  </tr>
+  <tr>
+    <th>Address</th>
+    <td>{{ address }}</td>
+  </tr>
+  {{#if number }}
+  <tr>
+    <th>Number</th>
+    <td>{{ number }}</td>
+  </tr>
+  {{/if}}
+  {{#if address_complement }}
+  <tr>
+    <th>Address Complement</th>
+    <td>{{ address_complement }}</td></tr>
+  {{/if}}
+  <tr>
+    <th>Postal Code</th>
+    <td>{{ postal_code }}</td>
+  </tr>
+  <tr>
+    <th>City</th>
+    <td>{{ city }}</td>
+  </tr>
+  <tr>
+    <th>State</th>
+    <td>{{ state }}</td>
+  </tr>
+</table>
+
+<p>
+Sorry for any inconvinience. Let us know if you have any questions.
+</p>

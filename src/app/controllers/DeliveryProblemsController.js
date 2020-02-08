@@ -115,7 +115,24 @@ class DeliveryProblemController {
         .json({ error: "Order does not exist or was already delivered" });
     }
     // Idempotent response if order is canceled
-    await Queue.add("CancellationOrderMail", { order, delivery_problem });
+    await Queue.add("CancellationOrderMail", {
+      to: `${order.deliveryman.name} <${order.deliveryman.email}>`,
+      subject: `Cancelation of order #${order.id}`,
+      template: "cancellation",
+      context: {
+        name: order.deliveryman.name,
+        order_id: order.id,
+        description: delivery_problem.description,
+        product: order.product,
+        recipient: order.recipient.name,
+        address: order.recipient.address,
+        number: order.recipient.number,
+        address_complement: order.recipient.address_complement,
+        postal_code: order.recipient.postal_code,
+        city: order.recipient.city,
+        state: order.recipient.state,
+      },
+    });
 
     if (order.canceled_at) {
       return res.json(order);

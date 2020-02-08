@@ -1,4 +1,4 @@
-import CancellationMail from "../../lib/CancellationMail";
+import Mail from "../../lib/Mail";
 
 class CancellationOrderMail {
   get key() {
@@ -6,8 +6,7 @@ class CancellationOrderMail {
   }
 
   async handle({ data }) {
-    console.log(data);
-    await CancellationMail.sendMail(data);
+    await Mail.sendMail(data);
   }
 }
 

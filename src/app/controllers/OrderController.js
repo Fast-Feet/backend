@@ -38,7 +38,22 @@ class OrderController {
       const deliveryman = await DeliveryMan.findByPk(req.body.deliveryman_id);
       const recipient = await Recipient.findByPk(req.body.recipient_id);
       // enqueue email to be sent to deliveryman
-      await Queue.add("NewOrderMail", { order, deliveryman, recipient });
+      await Queue.add("NewOrderMail", {
+        to: `${deliveryman.name} <${deliveryman.email}>`,
+        subject: `New order to be delivery in ${recipient.city}, ${recipient.state}`,
+        template: "newOrder",
+        context: {
+          name: deliveryman.name,
+          product: order.product,
+          recipient: recipient.name,
+          address: recipient.address,
+          number: recipient.number,
+          address_complement: recipient.address_complement,
+          postal_code: recipient.postal_code,
+          city: recipient.city,
+          state: recipient.state,
+        },
+      });
 
       return res.json({ order, deliveryman, recipient });
     } catch (error) {
