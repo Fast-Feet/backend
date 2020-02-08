@@ -2,6 +2,9 @@ import * as yup from "yup";
 
 import DeliveryProblem from "../schemas/DeliveryProblem";
 import Order from "../models/Order";
+import DeliveryMan from "../models/DeliveryMan";
+import Recipient from "../models/Recipient";
+import Queue from "../../lib/Queue";
 
 class DeliveryProblemController {
   async store(req, res) {
@@ -93,22 +96,39 @@ class DeliveryProblemController {
     }
     const delivery_problem = await DeliveryProblem.findById(problem_id);
     // Cancel order
-    const order = await Order.findByPk(delivery_problem.delivery_id);
+    const order = await Order.findByPk(delivery_problem.delivery_id, {
+      include: [
+        {
+          model: DeliveryMan,
+          as: "deliveryman",
+          attributes: ["name", "email"],
+        },
+        {
+          model: Recipient,
+          as: "recipient",
+        },
+      ],
+    });
     if (!order || order.end_date) {
       return res
         .status(401)
-        .json({ error: "Order does not exist or was already finished" });
+        .json({ error: "Order does not exist or was already delivered" });
     }
     // Idempotent response if order is canceled
+    await Queue.add("CancellationOrderMail", { order, delivery_problem });
+
     if (order.canceled_at) {
       return res.json(order);
     }
+    const cancellationDate = new Date();
     const orderUpdated = await order.update(
       {
-        canceled_at: new Date(),
+        canceled_at: cancellationDate,
       },
       { new: true }
     );
+    // Enqueue email to be send to deliveryman
+
     return res.json(orderUpdated);
   }
 }

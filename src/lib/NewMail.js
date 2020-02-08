@@ -2,7 +2,7 @@ import nodemailer from "nodemailer";
 
 import mailConfig from "../config/mail";
 
-class Mail {
+class NewMail {
   constructor() {
     this.transporter = nodemailer.createTransport(mailConfig, {
       from: "Fast Fleet <noreply@fastfleet.com>",
@@ -95,4 +95,4 @@ The Fast Fleet Team
   }
 }
 
-export default new Mail();
+export default new NewMail();

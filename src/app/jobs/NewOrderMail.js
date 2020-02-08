@@ -1,4 +1,4 @@
-import Mail from "../../lib/Mail";
+import NewMail from "../../lib/NewMail";
 
 class NewOrderMail {
   get key() {
@@ -6,7 +6,7 @@ class NewOrderMail {
   }
 
   async handle({ data }) {
-    await Mail.sendMail(data);
+    await NewMail.sendMail(data);
   }
 }
 
